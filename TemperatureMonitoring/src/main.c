@@ -5,6 +5,8 @@
 #include "../inc/ds18b20.h"
 #include "../inc/lcd1602.h"
 #include "../inc/buzzer.h"
+#include "../inc/fan.h"
+
 
 // ==================== 温度变量（×10格式） ====================
 unsigned int high_temp = 380;
@@ -52,6 +54,7 @@ void UpdateLCD(void);
 void CheckBuzzerAlarm(void);
 void ProcessTemperatureRead(void);
 void ShowStartupInfo(void);
+void FAN_Control(unsigned char enable);
 
 // ==================== 定时器0初始化 ====================
 void Timer0_Init(void)
@@ -493,6 +496,7 @@ void main(void)
 {
     unsigned char key_num;
     unsigned char lcd_update_count = 0;
+    P1 = 1;  // 设置 P1 为高电平，确保风扇初始状态为关闭
     
     // ===== 1. 初始化 =====
     KEY_Init();
@@ -593,6 +597,7 @@ void main(void)
             
             ProcessTemperatureRead();
             MonitorTemperature();
+            //FAN_Control(real_temp >= high_temp ? 1 : 0);
             
             lcd_update_count++;
             if (lcd_update_count >= 4)

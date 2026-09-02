@@ -6,14 +6,16 @@
 // ============================================
 void LCD_WriteCmd(unsigned char cmd)
 {
+    EA = 0;              // ✅ 关中断
     LCD_RS = 0;
     LCD_RW = 0;
     LCD_DB = cmd;
     
     LCD_E = 1;
-    Delay_Us(1);
+    Delay_Us(5);         // ✅ 增加延时
     LCD_E = 0;
-    Delay_Us(20);
+    Delay_Us(50);        // ✅ 增加延时
+    EA = 1;              // ✅ 开中断
 }
 
 // ============================================
@@ -21,14 +23,16 @@ void LCD_WriteCmd(unsigned char cmd)
 // ============================================
 void LCD_WriteData(unsigned char dat)
 {
+    EA = 0;
     LCD_RS = 1;
     LCD_RW = 0;
     LCD_DB = dat;
     
     LCD_E = 1;
-    Delay_Us(1);
+    Delay_Us(5);
     LCD_E = 0;
-    Delay_Us(20);
+    Delay_Us(50);
+    EA = 1;
 }
 
 // ============================================
@@ -40,19 +44,21 @@ void LCD_WriteString(unsigned char row, unsigned char *str)
     
     while (*str != '\0')
     {
+        EA = 0;
         LCD_RS = 1;
         LCD_RW = 0;
         LCD_DB = *str++;
         
         LCD_E = 1;
-        Delay_Us(1);
+        Delay_Us(5);
         LCD_E = 0;
-        Delay_Us(10);
+        Delay_Us(20);
+        EA = 1;
     }
 }
 
 // ============================================
-// LCD 初始化
+// LCD 初始化（保持不变）
 // ============================================
 void LCD_Init(void)
 {
@@ -86,18 +92,12 @@ void LCD_Init(void)
     LCD_WriteCmd(0x06);
 }
 
-// ============================================
-// LCD 清屏
-// ============================================
 void LCD_Clear(void)
 {
     LCD_WriteCmd(0x01);
     Delay_Ms(2);
 }
 
-// ============================================
-// LCD 设置光标
-// ============================================
 void LCD_SetCursor(unsigned char row, unsigned char col)
 {
     unsigned char addr;
