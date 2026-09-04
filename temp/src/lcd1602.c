@@ -1,11 +1,14 @@
 #include "../inc/lcd1602.h"
 #include "../inc/delay.h"
 
+bit lcd_busy = 0;   // ✅ 全局标志
+
 // ============================================
 // LCD 写指令
 // ============================================
 void LCD_WriteCmd(unsigned char cmd)
 {
+    lcd_busy = 1;    // ✅ 标记 LCD 忙碌
     LCD_RS = 0;
     LCD_RW = 0;
     LCD_DB = cmd;
@@ -14,6 +17,7 @@ void LCD_WriteCmd(unsigned char cmd)
     Delay_Us(1);
     LCD_E = 0;
     Delay_Us(20);
+    lcd_busy = 0;    // ✅ 标记 LCD 空闲
 }
 
 // ============================================
@@ -21,6 +25,7 @@ void LCD_WriteCmd(unsigned char cmd)
 // ============================================
 void LCD_WriteData(unsigned char dat)
 {
+    lcd_busy = 1;
     LCD_RS = 1;
     LCD_RW = 0;
     LCD_DB = dat;
@@ -29,6 +34,7 @@ void LCD_WriteData(unsigned char dat)
     Delay_Us(1);
     LCD_E = 0;
     Delay_Us(20);
+    lcd_busy = 0;
 }
 
 // ============================================
@@ -36,6 +42,7 @@ void LCD_WriteData(unsigned char dat)
 // ============================================
 void LCD_WriteString(unsigned char row, unsigned char *str)
 {
+    lcd_busy = 1;
     LCD_SetCursor(row, 0);
     
     while (*str != '\0')
@@ -49,6 +56,15 @@ void LCD_WriteString(unsigned char row, unsigned char *str)
         LCD_E = 0;
         Delay_Us(10);
     }
+    lcd_busy = 0;
+}
+
+// ============================================
+// 查询 LCD 是否忙碌
+// ============================================
+unsigned char LCD_IsBusy(void)
+{
+    return lcd_busy;
 }
 
 // ============================================
@@ -56,6 +72,7 @@ void LCD_WriteString(unsigned char row, unsigned char *str)
 // ============================================
 void LCD_Init(void)
 {
+    lcd_busy = 1;
     Delay_Ms(15);
     
     LCD_RS = 0;
@@ -84,6 +101,7 @@ void LCD_Init(void)
     LCD_WriteCmd(0x01);
     Delay_Ms(2);
     LCD_WriteCmd(0x06);
+    lcd_busy = 0;
 }
 
 // ============================================
@@ -91,8 +109,10 @@ void LCD_Init(void)
 // ============================================
 void LCD_Clear(void)
 {
+    lcd_busy = 1;
     LCD_WriteCmd(0x01);
     Delay_Ms(2);
+    lcd_busy = 0;
 }
 
 // ============================================
