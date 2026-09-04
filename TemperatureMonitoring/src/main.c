@@ -507,7 +507,7 @@ void main(void)
     Delay_Ms(10);
     LCD_Clear();
     
-    LoadThresholdFromEEPROM();
+    LoadThresholdFromEEPROM();//EEPROM 读取温度阈值
     
     // ===== 2. 检测传感器 =====
     CheckSensor();
